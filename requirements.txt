@@ -2,3 +2,4 @@ streamlit
 openai
 python-dotenv
 nltk
+google-generative-ai

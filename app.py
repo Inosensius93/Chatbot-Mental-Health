@@ -4,35 +4,13 @@ from dotenv import load_dotenv
 import os
 import base64
 
+# Load API
 load_dotenv()
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 model = genai.GenerativeModel("gemini-1.5-flash")
 
+# Setup halaman
 st.set_page_config(page_title="Mental Health Chatbot", page_icon="🧠", layout="centered")
-
-# CSS untuk chat
-st.markdown("""
-    <style>
-    .user-msg {
-        text-align: right;
-        background-color: #DCF8C6;
-        padding: 10px;
-        border-radius: 15px;
-        margin-bottom: 10px;
-        max-width: 75%;
-        margin-left: auto;
-    }
-    .bot-msg {
-        text-align: left;
-        background-color: #F1F0F0;
-        padding: 10px;
-        border-radius: 15px;
-        margin-bottom: 10px;
-        max-width: 75%;
-        margin-right: auto;
-    }
-    </style>
-""", unsafe_allow_html=True)
 
 # Inisialisasi state
 if "chat_started" not in st.session_state:
@@ -45,13 +23,74 @@ if "user_name" not in st.session_state:
     st.session_state.user_name = ""
 if "user_mood" not in st.session_state:
     st.session_state.user_mood = "netral"
+if "dark_mode" not in st.session_state:
+    st.session_state.dark_mode = False
+if "quick_message_clicked" not in st.session_state:
+    st.session_state.quick_message_clicked = False  # tambahan
 
-# Fungsi-fungsi
+# CSS Mode
+dark_css = """
+<style>
+body {
+    background-color: #121212;
+    color: white;
+}
+.user-msg {
+    text-align: right;
+    background-color: #2E8B57;
+    color: white;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    max-width: 75%;
+    margin-left: auto;
+}
+.bot-msg {
+    text-align: left;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    max-width: 75%;
+    margin-right: auto;
+}
+</style>
+"""
+
+light_css = """
+<style>
+.user-msg {
+    text-align: right;
+    background-color: #DCF8C6;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    max-width: 75%;
+    margin-left: auto;
+}
+.bot-msg {
+    text-align: left;
+    background-color: #F1F0F0;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    max-width: 75%;
+    margin-right: auto;
+}
+</style>
+"""
+
+# Tampilkan CSS sesuai mode
+st.markdown(dark_css if st.session_state.dark_mode else light_css, unsafe_allow_html=True)
+
+# Fungsi
 def reset_chat():
     st.session_state.history = []
     st.session_state.user_mood = "netral"
     st.session_state.ready_to_chat = False
     st.session_state.chat_started = False
+    st.session_state.quick_message_clicked = False  # reset quick message
 
 def export_chat():
     chat_text = "Riwayat Percakapan:\n\n"
@@ -112,7 +151,7 @@ def handle_message(user_message):
 
     st.session_state.history.append({"user": user_message, "bot": bot_reply})
 
-# Halaman Awal
+# Tampilan Awal
 if not st.session_state.chat_started:
     st.title("🧠 Mental Health Chatbot")
     st.markdown("Halo! Saya teman bicara virtual kamu. Klik tombol di bawah untuk mulai.")
@@ -121,7 +160,7 @@ if not st.session_state.chat_started:
         st.rerun()
     st.stop()
 
-# Form identitas pengguna (seperti pop-up)
+# Form identitas pengguna
 if st.session_state.chat_started and not st.session_state.ready_to_chat:
     with st.form("user_info_form"):
         st.subheader("Sebelum mulai, kenalan dulu yuk 😊")
@@ -138,9 +177,8 @@ if st.session_state.chat_started and not st.session_state.ready_to_chat:
             }[mood]
             st.session_state.ready_to_chat = True
             st.rerun()
-    st.stop()
 
-# Jika sudah siap chat
+# Tampilan Chat
 if st.session_state.ready_to_chat:
     st.markdown(f"### 👋 Hai {st.session_state.user_name or 'teman'}!")
 
@@ -150,20 +188,22 @@ if st.session_state.ready_to_chat:
             st.markdown(f'<div class="user-msg">{chat["user"]}</div>', unsafe_allow_html=True)
             st.markdown(f'<div class="bot-msg">{chat["bot"]}</div>', unsafe_allow_html=True)
 
-    # Quick Message
-    st.markdown("#### 💬 Quick Message")
-    quick_messages = [
-        "Saya merasa cemas",
-        "Saya butuh teman bicara",
-        "Saya ingin cerita tentang hari saya",
-        "Saya sedang stress karena kuliah",
-        "Saya tidak tahu harus bagaimana"
-    ]
-    quick_col = st.columns(len(quick_messages))
-    for i, msg in enumerate(quick_messages):
-        if quick_col[i].button(msg):
-            handle_message(msg)
-            st.rerun()
+    # Quick Message hanya muncul sekali klik
+    if not st.session_state.quick_message_clicked:
+        st.markdown("#### 💬 Quick Message")
+        quick_messages = [
+            "Saya merasa cemas",
+            "Saya butuh teman bicara",
+            "Saya ingin cerita tentang hari saya",
+            "Saya sedang stress karena kuliah",
+            "Saya tidak tahu harus bagaimana"
+        ]
+        cols = st.columns(len(quick_messages))
+        for i, msg in enumerate(quick_messages):
+            if cols[i].button(msg):
+                handle_message(msg)
+                st.session_state.quick_message_clicked = True
+                st.rerun()
 
     # Input Chat
     user_input = st.chat_input("Tulis pesan Anda...")
@@ -182,4 +222,8 @@ with st.sidebar:
         st.rerun()
     st.markdown(export_chat(), unsafe_allow_html=True)
     st.markdown("---")
+    dark_toggle = st.checkbox("🌙 Aktifkan Dark Mode", value=st.session_state.dark_mode)
+    if dark_toggle != st.session_state.dark_mode:
+        st.session_state.dark_mode = dark_toggle
+        st.rerun()
     st.caption("Chatbot ini bukan pengganti profesional. Hubungi darurat jika butuh bantuan segera.")

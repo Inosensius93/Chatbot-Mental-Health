@@ -61,9 +61,7 @@ def local_chat(question: str) -> str:
     with torch.no_grad():
         outputs = hf_model.generate(
             **inputs,
-            max_length=150,
-            num_beams=5,
-            early_stopping=True
+            max_length=150  # Hanya max_length yang kita butuhkan
         )
 
     response = hf_tokenizer.decode(outputs[0], skip_special_tokens=True)

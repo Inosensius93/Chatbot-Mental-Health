@@ -1,0 +1,10 @@
+# Virtual Environment
+/venv/
+
+# File API KEY
+.env
+.streamlit/
+
+# Folder cache Python
+__pycache__/
+*.pyc

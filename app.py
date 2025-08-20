@@ -44,7 +44,7 @@ def load_model_from_hub():
         try:
             tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME_ON_HUB)
             model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME_ON_HUB)
-            st.success("Model berhasil dimuat!")
+            #st.success("Model berhasil dimuat!")
             return tokenizer, model
         except Exception as e:
             st.error(f"❌ Gagal memuat model dari Hugging Face. Pastikan nama repositori '{MODEL_NAME_ON_HUB}' sudah benar dan bersifat publik. Error: {e}")

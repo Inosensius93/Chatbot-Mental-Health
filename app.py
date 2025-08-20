@@ -9,7 +9,7 @@ import re
 import os
 
 # Konfigurasi halaman
-st.set_page_config(page_title="Hybrid Mental Health Chatbot", page_icon="🧠", layout="centered")
+st.set_page_config(page_title="Mental Health Chatbot", page_icon="🧠", layout="centered")
 
 # --- Konfigurasi API Key dari Streamlit Secrets ---
 try:

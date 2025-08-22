@@ -167,7 +167,7 @@ if "user_mood" not in st.session_state:
     st.session_state.user_mood = "netral"
 
 if not st.session_state.chat_started:
-    st.title("🧠 Hybrid Mental Health Chatbot")
+    st.title("🧠 Hybrid Empathetic Chatbot")
     st.markdown("Halo! Saya teman bicara virtual kamu. Klik tombol di bawah untuk mulai.")
     if st.button("🚀 Mulai Chat"):
         st.session_state.chat_started = True

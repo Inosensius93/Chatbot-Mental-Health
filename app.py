@@ -9,7 +9,7 @@ import re
 import os
 
 # Konfigurasi halaman
-st.set_page_config(page_title="Hybrid Empathetic Chatbot", page_icon="🧠", layout="centered")
+st.set_page_config(page_title="Hybrid Interactive Chatbot", page_icon="🧠", layout="centered")
 
 # --- Konfigurasi API Key dari Streamlit Secrets ---
 try:
@@ -167,7 +167,7 @@ if "user_mood" not in st.session_state:
     st.session_state.user_mood = "netral"
 
 if not st.session_state.chat_started:
-    st.title("🧠 Hybrid Empathetic Chatbot")
+    st.title("🧠 Hybrid Interactive Chatbot")
     st.markdown("Halo! Saya teman bicara virtual kamu. Klik tombol di bawah untuk mulai.")
     if st.button("🚀 Mulai Chat"):
         st.session_state.chat_started = True
